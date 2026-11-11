@@ -5,22 +5,30 @@
    page-kind class on <body> would not survive the first state change. */
 
 :root {
-  --bg: #0b0d10;
-  --panel: #0e1116;
-  --sunk: #11151b;
-  --line: #1e2732;
+  --bg: #07090c;
+  --panel: #0c0f14;
+  --panel-hover: #12161e;
+  --sunk: #090b0e;
+  --line: #18202a;
+  --line-focus: #2d3b4e;
 
   --fg: #c8ced8;
-  --bright: #e6ebf2;
-  --dim: #7c8798;
-  --faint: #4d5765;
+  --bright: #f0f4f8;
+  --dim: #8894a8;
+  --faint: #525c6b;
 
-  --ok: #7fd0a0;
-  --bad: #d08a7f;
-  --warn: #d8c07f;
+  --ok: #6ee7b7;
+  --ok-bg: #10261f;
+  --ok-border: #1e4a3a;
+  --bad: #f87171;
+  --warn: #fbbf24;
 
-  --sans: "Segoe UI", system-ui, sans-serif;
-  --mono: Consolas, "DejaVu Sans Mono", monospace;
+  --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: Consolas, "Fira Code", "DejaVu Sans Mono", monospace;
+  
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --transition: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -35,34 +43,54 @@ body {
   background: var(--bg);
   color: var(--fg);
   font: 15px/1.45 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Custom Scrollbar for Logs / Panels --- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--sunk);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--faint);
 }
 
 /* --- the bar at the top of both pages ----------------------------------- */
 
 #brand {
-  padding: 8px 10px;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--line);
   background: var(--panel);
   text-align: center;
+  backdrop-filter: blur(8px);
 }
 
 #brand b {
   color: var(--bright);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   vertical-align: middle;
 }
 
 .byline {
   position: fixed;
-  bottom: 9px;
-  left: 11px;
+  bottom: 10px;
+  left: 14px;
   z-index: 9;
   margin: 0;
   color: var(--faint);
   font: 11px/1 var(--mono);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
+  pointer-events: none;
 }
 
 /* --- landing page ------------------------------------------------------- */
@@ -72,32 +100,33 @@ body {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 34px;
-  min-height: calc(100vh - 38px);
-  padding: 28px 20px 46px;
+  gap: 40px;
+  min-height: calc(100vh - 41px);
+  padding: 32px 20px 50px;
 }
 
 .meme {
   width: 260px;
   max-width: 44vw;
   height: auto;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
 }
 
 .panel {
-  width: 300px;
+  width: 320px;
 }
 
 .lede {
-  margin: 0 0 1.6em;
+  margin: 0 0 1.8em;
   color: var(--dim);
-  font-size: 13px;
-  letter-spacing: 0.04em;
+  font-size: 13.5px;
+  letter-spacing: 0.02em;
 }
 
 /* The note sits on the same line as the supported versions and must read as
    a note, not as a third supported one -- dimmer, and never broken apart. */
 .lede .soon {
-  opacity: 0.62;
+  opacity: 0.6;
   white-space: nowrap;
 }
 
@@ -106,60 +135,118 @@ body {
 }
 
 .opt {
-  display: block;
-  margin-bottom: 8px;
-  padding: 11px 13px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 12px 14px;
   border: 1px solid var(--line);
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   background: var(--panel);
   cursor: pointer;
+  transition: border-color var(--transition), background var(--transition), transform var(--transition);
 }
 
 .opt:hover {
-  border-color: #2b3a4c;
+  border-color: var(--line-focus);
+  background: var(--panel-hover);
 }
 
-.opt input {
-  margin: 0 9px 0 0;
-  vertical-align: middle;
+.opt input[type="radio"],
+.opt input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--line-focus);
+  border-radius: 50%;
+  background: var(--sunk);
+  margin: 0 12px 0 0;
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.opt input[type="checkbox"] {
+  border-radius: 4px;
+}
+
+.opt input:checked {
+  border-color: var(--ok);
+  background: var(--ok-bg);
+  box-shadow: 0 0 0 3px rgba(110, 231, 183, 0.1);
+}
+
+.opt input[type="radio"]:checked::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--ok);
+}
+
+.opt input[type="checkbox"]:checked::before {
+  content: "✓";
+  font-size: 11px;
+  color: var(--ok);
+  font-weight: bold;
+  line-height: 1;
 }
 
 .opt span {
   vertical-align: middle;
+  color: var(--fg);
+  font-size: 14.5px;
 }
 
 /* The autostart switch is a different kind of choice from the payload
    radios, so it sits apart from them rather than looking like a third one. */
 .opt-auto {
-  margin-top: 16px;
+  margin-top: 18px;
   border-style: dashed;
-  background: none;
+  background: transparent;
   color: var(--dim);
-  font-size: 14px;
+  font-size: 13.5px;
+}
+
+.opt-auto:hover {
+  background: rgba(255, 255, 255, 0.01);
 }
 
 .btn {
   display: block;
   width: 100%;
-  margin-top: 16px;
-  padding: 0.8em 1.4em;
-  border: 1px solid #2f4a3c;
-  border-radius: 5px;
-  background: #16231d;
+  margin-top: 18px;
+  padding: 0.85em 1.4em;
+  border: 1px solid var(--ok-border);
+  border-radius: var(--radius-sm);
+  background: var(--ok-bg);
   color: var(--ok);
   font: 700 15px/1 var(--sans);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   cursor: pointer;
+  transition: all var(--transition);
+  box-shadow: 0 4px 12px rgba(16, 38, 31, 0.4);
 }
 
-.btn:hover,
-.btn:focus {
+.btn:hover {
   border-color: var(--ok);
-  outline: none;
+  background: #143126;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(110, 231, 183, 0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--ok);
+  outline-offset: 2px;
 }
 
 .count {
-  margin: 12px 0 0;
+  margin: 14px 0 0;
   min-height: 1.2em;
   color: var(--ok);
   font: 12px/1.2 var(--mono);
@@ -174,13 +261,14 @@ body {
   position: fixed;
   top: calc(50% + 20px);
   left: 50%;
-  width: 46px;
-  height: 46px;
-  margin: -23px 0 0 -23px;
-  border: 4px solid var(--line);
+  width: 48px;
+  height: 48px;
+  margin: -24px 0 0 -24px;
+  border: 3px solid var(--line);
   border-top-color: var(--ok);
   border-radius: 50%;
-  animation: spin 0.9s linear infinite;
+  animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  filter: drop-shadow(0 0 10px rgba(110, 231, 183, 0.2));
 }
 
 @keyframes spin {
@@ -199,6 +287,7 @@ body {
   text-align: center;
   font-size: 16px;
   letter-spacing: 0.5px;
+  padding: 0 20px;
 }
 
 #wrap {
@@ -217,13 +306,15 @@ body.fail #spin {
 
 body.fail #msg {
   display: block;
+  color: var(--bad);
 }
 
 body.done #msg {
   display: block;
   color: var(--ok);
   font-weight: 700;
-  letter-spacing: 2px;
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 20px rgba(110, 231, 183, 0.3);
 }
 
 /* ?log=1 -- the full step log. The column is laid out with flex rather than
@@ -233,6 +324,7 @@ body.log {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  overflow: hidden;
 }
 
 body.log #spin,
@@ -245,14 +337,16 @@ body.log #wrap {
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  padding: 14px 18px 30px;
+  padding: 16px 20px 32px;
 }
 
 body.log #state {
   display: block;
-  margin: 0 0 8px;
-  font-size: 22px;
+  margin: 0 0 10px;
+  font-size: 20px;
   font-weight: 700;
+  color: var(--bright);
+  letter-spacing: -0.01em;
 }
 
 body.log #out {
@@ -260,12 +354,14 @@ body.log #out {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 10px 12px;
+  padding: 14px 16px;
   border: 1px solid var(--line);
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   background: var(--sunk);
-  font: 12px/1.45 var(--mono);
+  font: 12px/1.5 var(--mono);
   white-space: pre-wrap;
+  color: var(--fg);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* The live heap readout sits in the flow under the bar. Nothing on this page
@@ -273,7 +369,7 @@ body.log #out {
    stays in view without being positioned over the wordmark. */
 #ramBox {
   overflow: hidden;
-  padding: 5px 10px;
+  padding: 6px 14px;
   border-bottom: 1px solid var(--line);
   background: var(--sunk);
   color: var(--ok);
@@ -284,12 +380,14 @@ body.log #out {
 
 /* The retry notice, raised by jb.js when the chain throws or stalls. */
 .notice {
-  margin: 1em 0;
-  padding: 0.7em 1em;
-  border: 2px solid #e66;
-  background: #2a1414;
-  color: #f99;
-  font: 700 20px/1.4 var(--sans);
+  margin: 1.2em 0;
+  padding: 0.9em 1.2em;
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  border-radius: var(--radius-sm);
+  background: rgba(248, 113, 113, 0.08);
+  color: #fca5a5;
+  font: 600 16px/1.4 var(--sans);
+  box-shadow: 0 4px 12px rgba(248, 113, 113, 0.1);
 }
 
 .ok {
@@ -305,5 +403,10 @@ body.log #out {
 }
 
 code {
-  color: #9fb3d0;
+  color: #93c5fd;
+  font-family: var(--mono);
+  font-size: 0.9em;
+  background: rgba(147, 197, 253, 0.1);
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
 }
